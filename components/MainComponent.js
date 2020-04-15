@@ -31,7 +31,7 @@ const MenuStack = () => (
 
 const ContactStack = () => (
   <Stack.Navigator>
-    <Stack.Screen name="Contact Us" component={ContactUs} options={{ title: "Contact us" }} />
+    <Stack.Screen name="Contact Us" component={ContactUs} />
   </Stack.Navigator>
 );
 

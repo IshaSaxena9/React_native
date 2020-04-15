@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, FlatList, Platform, Text } from "react-native";
+import { View, FlatList, Platform } from "react-native";
 import { ListItem } from "react-native-elements";
 import { DISHES } from "../shared/dishes";
 import constants from "expo-constants";

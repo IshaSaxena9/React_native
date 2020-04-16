@@ -9,6 +9,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { Icon } from "react-native-elements";
 import { Image, StyleSheet, ScrollView, View, Text } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import DishDetail from "./DishDetailComponent";
 
 const Stack = createStackNavigator();
 
@@ -29,9 +30,10 @@ const AboutStack = () => (
 );
 
 const MenuStack = () => (
-  <Stack.Navigator>
+  <Stack.Navigator initialRouteName="Menu">
     <Stack.Screen name="Menu" component={Menu} 
     options={({ navigation }) => ({ headerStyle: {backgroundColor: "#512DA8"}, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
+    <Stack.Screen name="DishDetail" component={DishDetail} options={{ headerStyle: {backgroundColor: "#512DA8"}, headerTintColor: "#fff" }} />
   </Stack.Navigator>
 );
 

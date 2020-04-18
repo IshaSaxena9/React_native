@@ -1,5 +1,5 @@
 import * as ActionTypes from "./ActionTypes";
-import { baseUrl } from "../shared/dishes";
+import { baseUrl } from "../shared/baseUrl";
 
 export const fetchComments = () => dispatch => {
     return fetch(baseUrl + "comments")
@@ -97,7 +97,7 @@ export const promosFailed = errmess => ({
 });
 
 export const addPromos = promos => ({
-    type: ActionTypes.ADD_PROMOSa,
+    type: ActionTypes.ADD_PROMOS,
     payload: promos
 });
 
@@ -127,7 +127,7 @@ export const leadersLoading = () => ({
 });
 
 export const leadersFailed = errmess => ({
-    type: ActionTypes.LEADERS_FAILEDa,
+    type: ActionTypes.LEADERS_FAILED,
     payload: errmess
 });
 

@@ -10,6 +10,8 @@ import { Icon } from "react-native-elements";
 import { Image, StyleSheet, ScrollView, View, Text } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DishDetail from "./DishDetailComponent";
+import { fetchDishes, fetchComments, fetchPromos, fetchLeaders } from "../redux/ActionCreators";
+import { connect } from "react-redux";
 
 const Stack = createStackNavigator();
 
@@ -63,6 +65,13 @@ const CustomDrawerContentComponent = props => (
 );
 
 class Main extends Component {
+  componentDidMount() {
+    this.props.fetchDishes();
+    this.props.fetchComments();
+    this.props.fetchPromos();
+    this.props.fetchLeaders();
+  };
+
   render() {
     return (
       <NavigationContainer>
@@ -81,7 +90,14 @@ class Main extends Component {
   };
 };
 
-export default Main;
+const mapDispatchToProps = dispatch => ({
+  fetchDishes: () => dispatch(fetchDishes()),
+  fetchComments: () => dispatch(fetchComments()),
+  fetchLeaders: () => dispatch(fetchLeaders()),
+  fetchPromos: () => dispatch(fetchPromos())
+});
+
+export default connect(() => {}, mapDispatchToProps)(Main);
 
 const styles = StyleSheet.create({
   container: {

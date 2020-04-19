@@ -75,7 +75,7 @@ class Main extends Component {
   render() {
     return (
       <NavigationContainer>
-        <Drawer.Navigator initialRouteName="Menu" drawerStyle={{ backgroundColor: "#D1C4E9" }} drawerContent={props => <CustomDrawerContentComponent {...props} />}>
+        <Drawer.Navigator initialRouteName="Home" drawerStyle={{ backgroundColor: "#D1C4E9" }} drawerContent={props => <CustomDrawerContentComponent {...props} />}>
           <Drawer.Screen name="Home" component={HomeStack} options={{ drawerIcon: ({ color }) => (
           <Icon name="home" type="font-awesome" size={24} color={color} /> )}} />
           <Drawer.Screen name="About Us" component={AboutStack} options={{ drawerIcon: ({ color }) => (
@@ -97,7 +97,7 @@ const mapDispatchToProps = dispatch => ({
   fetchPromos: () => dispatch(fetchPromos())
 });
 
-export default connect(() => {}, mapDispatchToProps)(Main);
+export default connect(() => ({}), mapDispatchToProps)(Main);
 
 const styles = StyleSheet.create({
   container: {

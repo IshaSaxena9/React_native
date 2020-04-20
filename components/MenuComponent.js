@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import { View, FlatList, Platform } from "react-native";
+import { View, FlatList, Platform , Text} from "react-native";
 import { Tile } from "react-native-elements";
-import { DISHES } from "../shared/dishes";
 import constants from "expo-constants";
 import { connect } from "react-redux";
 import { baseUrl } from "../shared/baseUrl";
+import { Loading } from "./LoadingComponent";
 
 class Menu extends Component {
   render() {
@@ -20,6 +20,15 @@ class Menu extends Component {
       />
     );
 
+    if(this.props.dishes.isLoading) {
+      return <Loading />
+    } else if(this.props.dishes.errMess) {
+      return (
+        <View>
+          <Text>{this.props.dishes.errMess}</Text>
+        </View>
+      )
+    } else {
   return (
     <View style={{ flex: 1, paddingTop: Platform.OS === "ios" ? 0 : constants.statusBarHeight }}>
     <FlatList
@@ -28,7 +37,7 @@ class Menu extends Component {
       keyExtractor={item => item.id.toString()}
     />
     </View>
-  );
+  )};
   }
 };
 

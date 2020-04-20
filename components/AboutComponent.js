@@ -4,6 +4,7 @@ import { ListItem } from "react-native-elements";
 import { Card } from "react-native-elements";
 import { connect } from "react-redux";
 import { baseUrl } from "../shared/baseUrl";
+import { Loading } from "./LoadingComponent";
 
 const styles = StyleSheet.create({
   textView: {
@@ -36,11 +37,12 @@ class AboutUs extends React.Component {
       <Card
         title="Corporate Leadership"
       >
+      {this.props.leaders.isLoading ? <Loading /> : this.props.leaders.errMess ? <Text>{this.props.leaders.errMess}</Text> : (
         <FlatList
           data={this.props.leaders.leaders}
           renderItem={itemRenderer}
           keyExtractor={item => item.id.toString()}
-        />
+        />)}
       </Card>
     );
 

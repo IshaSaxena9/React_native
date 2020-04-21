@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import DishDetail from "./DishDetailComponent";
 import { fetchDishes, fetchComments, fetchPromos, fetchLeaders } from "../redux/ActionCreators";
 import { connect } from "react-redux";
+import Reservation from "./ReservationComponent";
 
 const Stack = createStackNavigator();
 
@@ -45,6 +46,13 @@ const ContactStack = () => (
     options={({ navigation }) => ({ headerStyle: {backgroundColor: "#512DA8"}, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
   </Stack.Navigator>
 );
+
+const ReservationStack = () => (
+  <Stack.Navigator>
+    <Stack.Screen name="Reservation" component={Reservation}
+    options={({ navigation }) => ({ headerStyle: {backgroundColor: "#512DA8"}, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
+  </Stack.Navigator>
+)
 
 const CustomDrawerContentComponent = props => (
   <ScrollView>
@@ -84,6 +92,8 @@ class Main extends Component {
           <Icon name="list" type="font-awesome" size={24} color={color} /> )}}/>
           <Drawer.Screen name="Contact Us" component={ContactStack} options={{ drawerIcon: ({ color }) => (
           <Icon name="address-card" type="font-awesome" size={22} color={color} /> )}} />
+          <Drawer.Screen name="Reserve Table" component={ReservationStack} options={{ drawerIcon: ({ color }) => (
+          <Icon name="cutlery" type="font-awesome" size={24} color={color} /> )}} />
         </Drawer.Navigator>
       </NavigationContainer>
     );

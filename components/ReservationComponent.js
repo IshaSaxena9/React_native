@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Picker, Switch, Button, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Picker, Switch, Button, TouchableOpacity, Modal } from "react-native";
 import DatePicker from "@react-native-community/datetimepicker";
 
 class Reservation extends React.Component {
@@ -10,7 +10,8 @@ class Reservation extends React.Component {
       smoking: false,
       date: new Date(),
       showDatePicker: false,
-      showTimePicker: false
+      showTimePicker: false,
+      showModal: false
     };
   };
 
@@ -27,6 +28,19 @@ class Reservation extends React.Component {
       showDatePicker: false,
       showTimePicker: false
     });
+    this.toggleModal();
+  };
+
+  resetForm = () => {
+    this.setState({
+      guests: 1,
+      smoking: false,
+      date: new Date(),
+    });
+  };
+
+  toggleModal = () => {
+    this.setState({ showModal: !this.state.showModal });
   };
 
   render() {
@@ -93,6 +107,34 @@ class Reservation extends React.Component {
             accessibilityLabel="Learn more about this purple button"
           />
         </View>
+        <Modal
+          animationType={"slide"}
+          transparent={false}
+          visible={this.state.showModal}
+          onDismiss={() => {
+            this.toggleModal();
+            this.resetForm();
+          }}
+          onRequestClose={() => {
+            this.toggleModal();
+            this.resetForm();
+          }}
+        >
+          <View style={styles.modal}>
+            <Text style={styles.modalTitle}>Your Reservation</Text>
+            <Text style={styles.modalText}>Number of Guests: {this.state.guests}</Text>
+            <Text style={styles.modalText}>Smoking?: {this.state.smoking ? "Yes" : "No"}</Text>
+            <Text style={styles.modalText}>Date and Time: {this.state.date.toUTCString()}</Text>
+            <Button 
+              onPress={() => {
+              this.toggleModal();
+              this.resetForm();
+              }}
+              color="#512DA8"
+              title="Close"
+              />
+          </View>
+        </Modal>
         </ScrollView>
     );
   };
@@ -112,6 +154,22 @@ const styles = StyleSheet.create({
   },
   formItem: {
     flex: 1
+  },
+  modal: {
+    justifyContent: "center",
+    margin: 20
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    backgroundColor: "#512AD8",
+    textAlign: "center",
+    color: "white",
+    marginBottom: 20
+  },
+  modalText: {
+    fontSize: 18,
+    margin: 10
   }
 });
 

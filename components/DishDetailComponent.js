@@ -1,17 +1,9 @@
 import React from "react";
-import { View, Text , ScrollView, FlatList, StyleSheet, Modal } from "react-native";
-import { Card, Icon } from "react-native-elements";
+import { View, Text , ScrollView, FlatList, StyleSheet, Modal, Button } from "react-native";
+import { Card, Icon, Rating, Input } from "react-native-elements";
 import { connect } from "react-redux";
 import { baseUrl } from "../shared/baseUrl";
-import { postFavourite } from "../redux/ActionCreators";
-
-const styles = StyleSheet.create({
-  icons: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center"
-  }
-});
+import { postFavourite, postComment } from "../redux/ActionCreators";
 
 function RenderDish(props) {
   const dish = props.dish;
@@ -59,7 +51,10 @@ class DishDetail extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      showForm: false
+      showForm: false,
+      rating: 0,
+      author: "",
+      comment: ""
     };
   };
 
@@ -72,11 +67,27 @@ class DishDetail extends React.Component {
   };
 
   resetForm = () => {
-    console.log("reset")
+    this.setState({
+      rating: 0,
+      author: "",
+      comment: ""
+    });
   };
 
   toggleModal = () => {
     this.setState({ showForm: !this.state.showForm });
+  };
+
+  handleComment = () => {
+    const { dishId = "" } = this.props.route.params;
+    const { rating, author, comment } = this.state;
+    if(author && comment) {
+      const commentObj = {
+        dishId, rating, author, comment
+      };
+      this.props.postComment(commentObj);
+    }
+    this.toggleModal();
   };
 
   render() {
@@ -84,7 +95,7 @@ class DishDetail extends React.Component {
     return (
       <ScrollView>
         <RenderDish dish={this.props.dishes.dishes[+dishId]} favourite={this.props.favourites.some(item => item === dishId)} onPress={() => this.markFavourite(dishId)} addComment={this.addComment} />
-        <RenderComments comments={this.props.comments.comments.filter(item => item.dishId === dishId)} />
+        {this.props.comments.comments.length ? <RenderComments comments={this.props.comments.comments.filter(item => item.dishId === dishId)} /> : null}
         <Modal
           animationType={"slide"}
           transparent={false}
@@ -98,7 +109,48 @@ class DishDetail extends React.Component {
             this.resetForm();
           }}
         >
-          <Text>jdhsvdh</Text>
+          <View style={styles.modal}>
+            <Rating
+            showRating
+            startingValue={0}
+            ratingCount={5}
+            minValue={1}
+            onFinishRating={rating => this.setState({ rating })}
+            />
+            <Input
+              placeholder="Author"
+              leftIcon={
+                <Icon name="user" size={24} type="font-awesome" iconStyle={styles.formIcons} />
+              }
+              value={this.state.author}
+              onChangeText={author => this.setState({ author })}
+              containerStyle={styles.formInput}
+            />
+            <Input
+              placeholder="Comment"
+              leftIcon={
+                <Icon name="comment" size={22} type="font-awesome" iconStyle={styles.formIcons} />
+              }
+              value={this.state.comment}
+              onChangeText={comment => this.setState({ comment })}
+              containerStyle={styles.formInput}
+            />
+            <Text />
+            <Button 
+              onPress={this.handleComment}
+              color="#512DA8"
+              title="Submit"
+              />
+              <Text />
+              <Button 
+              onPress={() => {
+              this.toggleModal();
+              this.resetForm();
+              }}
+              color="#85807f"
+              title="Cancel"
+              />
+          </View>
         </Modal>
       </ScrollView>
     );
@@ -112,7 +164,25 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  postFavourite: dishId => dispatch(postFavourite(dishId))
+  postFavourite: dishId => dispatch(postFavourite(dishId)),
+  postComment: comment => dispatch(postComment(comment))
+});
+
+const styles = StyleSheet.create({
+  icons: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center"
+  },
+  modal: {
+    margin: 25
+  },
+  formIcons: {
+    marginRight: 5
+  },
+  formInput: {
+    marginTop: 20
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DishDetail);

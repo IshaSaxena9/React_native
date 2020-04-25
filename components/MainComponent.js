@@ -13,6 +13,7 @@ import DishDetail from "./DishDetailComponent";
 import { fetchDishes, fetchComments, fetchPromos, fetchLeaders } from "../redux/ActionCreators";
 import { connect } from "react-redux";
 import Reservation from "./ReservationComponent";
+import Favourites from "./FavouriteComponent";
 
 const Stack = createStackNavigator();
 
@@ -52,7 +53,14 @@ const ReservationStack = () => (
     <Stack.Screen name="Reservation" component={Reservation}
     options={({ navigation }) => ({ headerStyle: {backgroundColor: "#512DA8"}, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
   </Stack.Navigator>
-)
+);
+
+const FavouriteStack = () => (
+  <Stack.Navigator>
+    <Stack.Screen name="My Favourites" component={Favourites}
+    options={({ navigation }) => ({ headerStyle: {backgroundColor: "#512DA8"}, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
+  </Stack.Navigator>
+);
 
 const CustomDrawerContentComponent = props => (
   <ScrollView>
@@ -94,6 +102,8 @@ class Main extends Component {
           <Icon name="address-card" type="font-awesome" size={22} color={color} /> )}} />
           <Drawer.Screen name="Reserve Table" component={ReservationStack} options={{ drawerIcon: ({ color }) => (
           <Icon name="cutlery" type="font-awesome" size={24} color={color} /> )}} />
+          <Drawer.Screen name="My Favourites" component={FavouriteStack} options={{ drawerIcon: ({ color }) => (
+          <Icon name="heart" type="font-awesome" size={24} color={color} /> )}} />
         </Drawer.Navigator>
       </NavigationContainer>
     );

@@ -5,11 +5,13 @@ import constants from "expo-constants";
 import { connect } from "react-redux";
 import { baseUrl } from "../shared/baseUrl";
 import { Loading } from "./LoadingComponent";
+import * as Animatable from "react-native-animatable";
 
 class Menu extends Component {
   render() {
     const { navigation } = this.props;
     const renderMenuItem = ({ item, index }) => (
+      <Animatable.View animation="fadeInRightBig" duration={2000}>
       <Tile
         key={index}
         title={item.name}
@@ -18,6 +20,7 @@ class Menu extends Component {
         onPress={() => navigation.navigate("DishDetail", { dishId: item.id })}
         imageSrc={{ uri: baseUrl + item.image }}
       />
+      </Animatable.View>
     );
 
     if(this.props.dishes.isLoading) {

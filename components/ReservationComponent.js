@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, ScrollView, StyleSheet, Picker, Switch, Button, TouchableOpacity, Modal } from "react-native";
 import DatePicker from "@react-native-community/datetimepicker";
+import * as Animatable from "react-native-animatable";
 
 class Reservation extends React.Component {
   constructor(props) {
@@ -47,6 +48,7 @@ class Reservation extends React.Component {
     const { showDatePicker, showTimePicker } = this.state;
     return  (
       <ScrollView>
+        <Animatable.View animation="zoomIn">
         <View style={styles.formRow}>
           <Text style={styles.formLabel}>Number of Guests</Text>
           <Picker
@@ -107,6 +109,7 @@ class Reservation extends React.Component {
             accessibilityLabel="Learn more about this purple button"
           />
         </View>
+        </Animatable.View>
         <Modal
           animationType={"slide"}
           transparent={false}

@@ -14,6 +14,7 @@ import { fetchDishes, fetchComments, fetchPromos, fetchLeaders } from "../redux/
 import { connect } from "react-redux";
 import Reservation from "./ReservationComponent";
 import Favourites from "./FavouriteComponent";
+import Login from "./LoginComponent";
 
 const Stack = createStackNavigator();
 
@@ -62,6 +63,13 @@ const FavouriteStack = () => (
   </Stack.Navigator>
 );
 
+const LoginStack = () => (
+  <Stack.Navigator>
+    <Stack.Screen name="Login" component={Login}
+    options={({ navigation }) => ({ headerStyle: {backgroundColor: "#512DA8"}, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
+  </Stack.Navigator>
+);
+
 const CustomDrawerContentComponent = props => (
   <ScrollView>
     <SafeAreaView style={styles.container} forceInset={{ top: "always", horizontal: "never" }}>
@@ -92,6 +100,8 @@ class Main extends Component {
     return (
       <NavigationContainer>
         <Drawer.Navigator initialRouteName="Home" drawerStyle={{ backgroundColor: "#D1C4E9" }} drawerContent={props => <CustomDrawerContentComponent {...props} />}>
+          <Drawer.Screen name="Login" component={LoginStack} options={{ drawerIcon: ({ color }) => (
+          <Icon name="sign-in" type="font-awesome" size={24} color={color} /> )}} />
           <Drawer.Screen name="Home" component={HomeStack} options={{ drawerIcon: ({ color }) => (
           <Icon name="home" type="font-awesome" size={24} color={color} /> )}} />
           <Drawer.Screen name="About Us" component={AboutStack} options={{ drawerIcon: ({ color }) => (

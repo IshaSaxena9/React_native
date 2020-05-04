@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { View, Text , ScrollView, FlatList, StyleSheet, Modal, Button, Alert, PanResponder } from "react-native";
 import { Card, Icon, Rating, Input } from "react-native-elements";
 import { connect } from "react-redux";
@@ -8,11 +8,17 @@ import * as Animatable from "react-native-animatable";
 
 function RenderDish(props) {
   const dish = props.dish;
+  const viewRef = useRef(null);
 
-  handleViewRef = ref => this.view = ref;
+  const recognizeRightToLeftDrag = ({ dx }) => {
+    if(dx < -150) {
+      return true;
+    };
+    return false;
+  };
 
-  const recognizeDrag = ({ moveX, moveY, dx, dy }) => {
-    if(dx < -200) {
+  const recognizeLeftToRightDrag = ({ dx }) => {
+    if(dx > 150) {
       return true;
     };
     return false;
@@ -23,11 +29,11 @@ function RenderDish(props) {
       return true;
     },
     onPanResponderGrant: () => {
-      this.view.rubberBand(1000)
+      viewRef.current.rubberBand(1000)
       .then(endState => console.log(endState.finished ? "Finished" : "Cancelled"));
     },
     onPanResponderEnd: (_e, gestureState) => {
-      if(recognizeDrag(gestureState)) {
+      if(recognizeRightToLeftDrag(gestureState)) {
         Alert.alert("Add to Favourites", "Are you sure you wish to add" + dish.name + " to your favourites?",
         [
           {
@@ -41,6 +47,8 @@ function RenderDish(props) {
         ],
         { cancelable: false}
         )
+      } else if(recognizeLeftToRightDrag(gestureState)) {
+          props.addComment();
       };
       return true;
     }
@@ -48,7 +56,7 @@ function RenderDish(props) {
 
   if(dish) {
     return (
-      <Animatable.View animation="fadeInDown" duration={2000} delay={1000} {...panResponder.panHandlers} ref={this.handleViewRef}>
+      <Animatable.View animation="fadeInDown" duration={2000} delay={1000} {...panResponder.panHandlers} ref={viewRef}>
       <Card
         featuredTitle={dish.name}
         image={{ uri: baseUrl + dish.image }}

@@ -1,15 +1,62 @@
-import React from "react";
-import { View, Text , ScrollView, FlatList, StyleSheet, Modal, Button } from "react-native";
+import React, { useRef } from "react";
+import { View, Text , ScrollView, FlatList, StyleSheet, Modal, Button, Alert, PanResponder } from "react-native";
 import { Card, Icon, Rating, Input } from "react-native-elements";
 import { connect } from "react-redux";
 import { baseUrl } from "../shared/baseUrl";
 import { postFavourite, postComment } from "../redux/ActionCreators";
+import * as Animatable from "react-native-animatable";
 
 function RenderDish(props) {
   const dish = props.dish;
+  const viewRef = useRef(null);
+
+  const recognizeRightToLeftDrag = ({ dx }) => {
+    if(dx < -150) {
+      return true;
+    };
+    return false;
+  };
+
+  const recognizeLeftToRightDrag = ({ dx }) => {
+    if(dx > 150) {
+      return true;
+    };
+    return false;
+  };
+
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: (_e, _gestureState) => {
+      return true;
+    },
+    onPanResponderGrant: () => {
+      viewRef.current.rubberBand(1000)
+      .then(endState => console.log(endState.finished ? "Finished" : "Cancelled"));
+    },
+    onPanResponderEnd: (_e, gestureState) => {
+      if(recognizeRightToLeftDrag(gestureState)) {
+        Alert.alert("Add to Favourites", "Are you sure you wish to add" + dish.name + " to your favourites?",
+        [
+          {
+            text: "Cancel",
+            onPress: () => console.log("Cancel pressed"),
+          },
+          {
+            text: "OK",
+            onPress: () => props.favourite ? console.log("Already favourite") : props.onPress()
+          }
+        ],
+        { cancelable: false}
+        )
+      } else if(recognizeLeftToRightDrag(gestureState)) {
+          props.addComment();
+      };
+      return true;
+    }
+  });
 
   if(dish) {
     return (
+      <Animatable.View animation="fadeInDown" duration={2000} delay={1000} {...panResponder.panHandlers} ref={viewRef}>
       <Card
         featuredTitle={dish.name}
         image={{ uri: baseUrl + dish.image }}
@@ -22,6 +69,7 @@ function RenderDish(props) {
         <Icon raised reverse name="pencil" type="font-awesome" color="#512DA8" onPress={props.addComment} />
         </View>
       </Card>
+      </Animatable.View>
     );
   } else {
     return <View />;
@@ -41,9 +89,11 @@ function RenderComments(props) {
     )
   };
   return (
+    <Animatable.View animation="fadeInUp" duration={2000} delay={1000}>
     <Card title="Comments">
       <FlatList data={comments} renderItem={renderCommentItem} keyExtractor={item => item.id.toString()} />
     </Card>
+    </Animatable.View>
   )
 }
 

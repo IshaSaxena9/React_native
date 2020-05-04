@@ -1,7 +1,9 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Picker, Switch, Button, TouchableOpacity, Alert } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Picker, Switch, Button, TouchableOpacity, Alert, Platform } from "react-native";
 import DatePicker from "@react-native-community/datetimepicker";
 import * as Animatable from "react-native-animatable";
+import * as Permissions from 'expo-permissions';
+import { Notifications } from "expo";
 
 class Reservation extends React.Component {
   constructor(props) {
@@ -23,7 +25,11 @@ class Reservation extends React.Component {
     const { guests, smoking, date } = this.state;
     Alert.alert("Your Reservation OK?", `Number of Guests: ${guests}\nSmoking?: ${smoking}\nDate and Time: ${date.toString()}`, [
       {text: "Cancel", onPress: () => this.resetForm()},
-      {text: "OK", onPress: () =>  this.resetForm()}
+      {text: "OK", onPress: () =>  {
+          this.presentLocalNotification(this.state.date);
+          this.resetForm();
+        }
+      }
     ],
     {cancelable: false});
   };
@@ -35,6 +41,39 @@ class Reservation extends React.Component {
       date: new Date(),
       showDatePicker: false,
       showTimePicker: false
+    });
+  };
+
+  obtainNotificationPermission = async () => {
+    let permission = await Permissions.getAsync(Permissions.USER_FACING_NOTIFICATIONS);
+    if(permission.status !== "granted") {
+      permission = await Permissions.askAsync(Permissions.USER_FACING_NOTIFICATIONS);
+      if(permission.status !== "granted") {
+        Alert.alert("Permission not granted to show notifications");
+      };
+    };
+    return permission;
+  };
+
+  presentLocalNotification = async date => {
+    await this.obtainNotificationPermission();
+    if(Platform.OS === "android") {
+      Notifications.createChannelAndroidAsync("notify", {
+        name: "notify",
+        sound: true,
+        vibrate: true
+      })
+    };
+    Notifications.presentLocalNotificationAsync({
+      title: "Your Reservation",
+      body: "Reservation for " + date.toDateString() + " requested",
+      ios: {
+        sound: true
+      },
+      android: {
+        color: "#512DA8",
+        channelId: "notify"
+      }
     });
   };
 

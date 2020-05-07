@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, ScrollView, Image } from "react-native";
 import { Input, CheckBox, Button, Icon } from "react-native-elements";
 import * as SecureStore from 'expo-secure-store';
 import * as Permissions from 'expo-permissions';
-import { ImagePicker } from "expo";
+import * as ImagePicker from 'expo-image-picker';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { baseUrl } from "../shared/baseUrl";
 
@@ -103,10 +103,42 @@ class RegisterTab extends Component {
     };
   };
 
+  getImageFromCamera = async () => {
+    const cameraPermission = await Permissions.askAsync(Permissions.CAMERA);
+    const cameraRollPermission = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    if(cameraPermission.status === "granted" && cameraRollPermission.status === "granted") {
+      let capturedImage = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4,3]
+      });
+      if(!capturedImage.cancelled) {
+        this.setState({ imageUrl: capturedImage.uri });
+      };
+    };
+  };
+
+  handleRegister = () => {
+    console.log(JSON.stringify(this.state));
+    if(this.state.remember) {
+      SecureStore.setItemAsync("userinfo", JSON.stringify({
+        username, password
+      }))
+      .catch(error => console.log("Could not save user info ", error));
+    };
+  };
+
   render() {
     return (
       <ScrollView>
       <View style={styles.container}>
+      <View style={styles.imageContainer}>
+        <Image 
+          source={{ uri: this.state.imageUrl }}
+          loadingIndicatorSource={require("./images/logo.png")}
+          style={styles.image}
+        />
+        <Button title="Camera" onPress={this.getImageFromCamera} />
+      </View>
         <Input
           placeholder="Username"
           leftIcon={{ type: "font-awesome", name: "user-o" }}
@@ -207,6 +239,16 @@ const styles = StyleSheet.create({
   },
   leftIcon: {
     marginRight: 10
+  },
+  imageContainer: {
+    flex: 1,
+    flexDirection: "row",
+    margin: 20
+  },
+  image: {
+    margin: 10,
+    width: 80,
+    height: 60
   }
 });
 

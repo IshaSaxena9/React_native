@@ -7,14 +7,15 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator, DrawerItemList } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import { Icon } from "react-native-elements";
-import { Image, StyleSheet, ScrollView, View, Text } from "react-native";
+import { Image, StyleSheet, ScrollView, View, Text, ToastAndroid } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DishDetail from "./DishDetailComponent";
 import { fetchDishes, fetchComments, fetchPromos, fetchLeaders } from "../redux/ActionCreators";
-import { connect } from "react-redux";
 import Reservation from "./ReservationComponent";
 import Favourites from "./FavouriteComponent";
 import Login from "./LoginComponent";
+import NetInfo from "@react-native-community/netinfo";
+import { connect } from "react-redux";
 
 const Stack = createStackNavigator();
 
@@ -94,6 +95,36 @@ class Main extends Component {
     this.props.fetchComments();
     this.props.fetchPromos();
     this.props.fetchLeaders();
+
+    NetInfo.fetch()
+    .then(connectionInfo => {
+      ToastAndroid.show("Initial Network Connection Type: " + connectionInfo.type, ToastAndroid.LONG);
+    });
+
+    NetInfo.addEventListener(this.handleConnectivityChange);
+  };
+
+  componentWillUnmount() {
+    NetInfo.removeEventListener(this.handleConnectivityChange);
+  };
+
+  handleConnectivityChange = connectionInfo => {
+    switch(connectionInfo.type) {
+      case "none": 
+        ToastAndroid.show("You are now offline!", ToastAndroid.LONG);
+        break;
+      case "wifi":
+        ToastAndroid.show("You are now connected to wifi!", ToastAndroid.LONG);
+        break;
+      case "cellular":
+        ToastAndroid.show("You are now connected to cellular!", ToastAndroid.LONG);
+        break;
+      case "unkown":
+        ToastAndroid.show("You now have an unknown connection!", ToastAndroid.LONG);
+        break;
+      default:
+        break;
+    };
   };
 
   render() {

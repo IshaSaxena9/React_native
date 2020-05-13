@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { View, Text , ScrollView, FlatList, StyleSheet, Modal, Button, Alert, PanResponder } from "react-native";
+import { View, Text , ScrollView, FlatList, StyleSheet, Modal, Button, Alert, PanResponder, Share } from "react-native";
 import { Card, Icon, Rating, Input } from "react-native-elements";
 import { connect } from "react-redux";
 import { baseUrl } from "../shared/baseUrl";
@@ -54,6 +54,16 @@ function RenderDish(props) {
     }
   });
 
+  shareDish = (title, message, url) => {
+    Share.share({
+      title,
+      message: title + ": " + message + " " + url,
+      url
+    }, {
+      dialogTitle: "Share " + title
+    });
+  };
+
   if(dish) {
     return (
       <Animatable.View animation="fadeInDown" duration={2000} delay={1000} {...panResponder.panHandlers} ref={viewRef}>
@@ -67,6 +77,7 @@ function RenderDish(props) {
         <View style={styles.icons}>
         <Icon raised reverse name={props.favourite ? "heart" : "heart-o"} type="font-awesome" color="#f50" onPress={() => props.favourite ? console.log("Already favourite") : props.onPress()} />
         <Icon raised reverse name="pencil" type="font-awesome" color="#512DA8" onPress={props.addComment} />
+        <Icon raised reverse name="share" type="font-awesome" color="#51D2A8" onPress={() => this.shareDish(dish.name, dish.description, baseUrl+dish.image)} />
         </View>
       </Card>
       </Animatable.View>

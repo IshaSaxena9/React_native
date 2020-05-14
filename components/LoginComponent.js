@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, StyleSheet, Text, ScrollView, Image } from "react-native";
+import { View, StyleSheet, ScrollView, Image } from "react-native";
 import { Input, CheckBox, Button, Icon } from "react-native-elements";
 import * as SecureStore from 'expo-secure-store';
 import * as Permissions from 'expo-permissions';
@@ -104,6 +104,18 @@ class RegisterTab extends Component {
     };
   };
 
+  getImageFromGallery = async () => {
+    const cameraRollPermission = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    if(cameraRollPermission.status === "granted") {
+      let fetchedImage = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [4,3]
+      });
+      if(!fetchedImage.cancelled)
+        this.processImage(fetchedImage.uri);
+    };
+  };
+
   getImageFromCamera = async () => {
     const cameraPermission = await Permissions.askAsync(Permissions.CAMERA);
     const cameraRollPermission = await Permissions.askAsync(Permissions.CAMERA_ROLL);
@@ -149,6 +161,7 @@ class RegisterTab extends Component {
           style={styles.image}
         />
         <Button title="Camera" onPress={this.getImageFromCamera} />
+        <Button title="Gallery" onPress={this.getImageFromGallery} buttonStyle={{ marginLeft: 10 }} />
       </View>
         <Input
           placeholder="Username"

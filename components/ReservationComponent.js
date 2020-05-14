@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, Picker, Switch, Button, TouchableOp
 import DatePicker from "@react-native-community/datetimepicker";
 import * as Animatable from "react-native-animatable";
 import * as Permissions from 'expo-permissions';
+import * as Calendar from 'expo-calendar';
 import { Notifications } from "expo";
 
 class Reservation extends React.Component {
@@ -27,6 +28,7 @@ class Reservation extends React.Component {
       {text: "Cancel", onPress: () => this.resetForm()},
       {text: "OK", onPress: () =>  {
           this.presentLocalNotification(this.state.date);
+          this.addReservationToCalendar(this.state.date);
           this.resetForm();
         }
       }
@@ -50,6 +52,31 @@ class Reservation extends React.Component {
       permission = await Permissions.askAsync(Permissions.USER_FACING_NOTIFICATIONS);
       if(permission.status !== "granted") {
         Alert.alert("Permission not granted to show notifications");
+      };
+    };
+    return permission;
+  };
+
+  addReservationToCalendar = async date => {
+    let startDate = new Date(date);
+    const calendarPerm = await this.obtainCalendarPermission();
+    if(calendarPerm.status === "granted") {
+      Calendar.createEventAsync("1", {
+        title: "Con Fusion Table Reservation",
+        startDate: date,
+        endDate: startDate.setHours(startDate.getHours() + 2),
+        timeZone: "Asia/Hong_Kong",
+        location: "121, Clear Water Bay Road, Clear Water Bay, Kowloon, Hong Kong"
+      });
+    };
+  };
+
+  obtainCalendarPermission = async () => {
+    let permission = await Permissions.getAsync(Permissions.CALENDAR);
+    if(permission.status !== "granted") {
+      permission = await Permissions.askAsync(Permissions.CALENDAR);
+      if(permission.status !== "granted") {
+        Alert.alert("Permission not granted to access calendar");
       };
     };
     return permission;

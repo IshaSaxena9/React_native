@@ -16,6 +16,12 @@ import Favourites from "./FavouriteComponent";
 import Login from "./LoginComponent";
 import NetInfo from "@react-native-community/netinfo";
 import { connect } from "react-redux";
+import * as Permissions from 'expo-permissions';
+import { Notifications } from "expo";
+import firebase from "firebase";
+import { firebaseConfig } from "../firebase";
+
+firebase.initializeApp(firebaseConfig);
 
 const Stack = createStackNavigator();
 
@@ -24,50 +30,50 @@ const Drawer = createDrawerNavigator();
 const HomeStack = () => (
   <Stack.Navigator>
     <Stack.Screen name="Home" component={Home}
-    options={({ navigation }) => ({ headerStyle: {backgroundColor: "#512DA8"}, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
+      options={({ navigation }) => ({ headerStyle: { backgroundColor: "#512DA8" }, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
   </Stack.Navigator>
 );
 
 const AboutStack = () => (
   <Stack.Navigator>
     <Stack.Screen name="About Us" component={AboutUs}
-    options={({ navigation }) => ({ headerStyle: {backgroundColor: "#512DA8"}, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
+      options={({ navigation }) => ({ headerStyle: { backgroundColor: "#512DA8" }, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
   </Stack.Navigator>
 );
 
 const MenuStack = () => (
   <Stack.Navigator initialRouteName="Menu">
-    <Stack.Screen name="Menu" component={Menu} 
-    options={({ navigation }) => ({ headerStyle: {backgroundColor: "#512DA8"}, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
-    <Stack.Screen name="DishDetail" component={DishDetail} options={{ headerStyle: {backgroundColor: "#512DA8"}, headerTintColor: "#fff" }} />
+    <Stack.Screen name="Menu" component={Menu}
+      options={({ navigation }) => ({ headerStyle: { backgroundColor: "#512DA8" }, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
+    <Stack.Screen name="DishDetail" component={DishDetail} options={{ headerStyle: { backgroundColor: "#512DA8" }, headerTintColor: "#fff" }} />
   </Stack.Navigator>
 );
 
 const ContactStack = () => (
   <Stack.Navigator>
     <Stack.Screen name="Contact Us" component={ContactUs}
-    options={({ navigation }) => ({ headerStyle: {backgroundColor: "#512DA8"}, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
+      options={({ navigation }) => ({ headerStyle: { backgroundColor: "#512DA8" }, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
   </Stack.Navigator>
 );
 
 const ReservationStack = () => (
   <Stack.Navigator>
     <Stack.Screen name="Reservation" component={Reservation}
-    options={({ navigation }) => ({ headerStyle: {backgroundColor: "#512DA8"}, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
+      options={({ navigation }) => ({ headerStyle: { backgroundColor: "#512DA8" }, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
   </Stack.Navigator>
 );
 
 const FavouriteStack = () => (
   <Stack.Navigator>
     <Stack.Screen name="My Favourites" component={Favourites}
-    options={({ navigation }) => ({ headerStyle: {backgroundColor: "#512DA8"}, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
+      options={({ navigation }) => ({ headerStyle: { backgroundColor: "#512DA8" }, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
   </Stack.Navigator>
 );
 
 const LoginStack = () => (
   <Stack.Navigator>
     <Stack.Screen name="Login" component={Login}
-    options={({ navigation }) => ({ headerStyle: {backgroundColor: "#512DA8"}, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
+      options={({ navigation }) => ({ headerStyle: { backgroundColor: "#512DA8" }, headerTintColor: "#fff", headerLeft: () => <Icon name="menu" size={24} color="white" onPress={() => navigation.toggleDrawer()} /> })} />
   </Stack.Navigator>
 );
 
@@ -97,20 +103,40 @@ class Main extends Component {
     this.props.fetchLeaders();
 
     NetInfo.fetch()
-    .then(connectionInfo => {
-      ToastAndroid.show("Initial Network Connection Type: " + connectionInfo.type, ToastAndroid.LONG);
-    });
+      .then(connectionInfo => {
+        ToastAndroid.show("Initial Network Connection Type: " + connectionInfo.type, ToastAndroid.LONG);
+      });
 
     NetInfo.addEventListener(this.handleConnectivityChange);
+    this.registerForPushNotifications();
   };
 
   componentWillUnmount() {
     NetInfo.removeEventListener(this.handleConnectivityChange);
   };
 
+  registerForPushNotifications = async () => {
+    try {
+      let permission = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+      if (permission.status !== "granted") {
+        permission = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+        if (permission.status !== "granted") { return };
+      };
+      let token = await Notifications.getExpoPushTokenAsync();
+      var updates = {};
+      updates['/users/' + "test user"] = {
+        email: "test@testuser.com",
+        expoPushToken: token
+      };
+      firebase.database().ref().update(updates);
+    } catch (err) {
+      console.log(err);
+    };
+  };
+
   handleConnectivityChange = connectionInfo => {
-    switch(connectionInfo.type) {
-      case "none": 
+    switch (connectionInfo.type) {
+      case "none":
         ToastAndroid.show("You are now offline!", ToastAndroid.LONG);
         break;
       case "wifi":
@@ -131,20 +157,34 @@ class Main extends Component {
     return (
       <NavigationContainer>
         <Drawer.Navigator initialRouteName="Home" drawerStyle={{ backgroundColor: "#D1C4E9" }} drawerContent={props => <CustomDrawerContentComponent {...props} />}>
-          <Drawer.Screen name="Login" component={LoginStack} options={{ drawerIcon: ({ color }) => (
-          <Icon name="sign-in" type="font-awesome" size={24} color={color} /> )}} />
-          <Drawer.Screen name="Home" component={HomeStack} options={{ drawerIcon: ({ color }) => (
-          <Icon name="home" type="font-awesome" size={24} color={color} /> )}} />
-          <Drawer.Screen name="About Us" component={AboutStack} options={{ drawerIcon: ({ color }) => (
-          <Icon name="info-circle" type="font-awesome" size={24} color={color} /> )}} />
-          <Drawer.Screen name="Menu" component={MenuStack} options={{ drawerIcon: ({ color }) => (
-          <Icon name="list" type="font-awesome" size={24} color={color} /> )}}/>
-          <Drawer.Screen name="Contact Us" component={ContactStack} options={{ drawerIcon: ({ color }) => (
-          <Icon name="address-card" type="font-awesome" size={22} color={color} /> )}} />
-          <Drawer.Screen name="Reserve Table" component={ReservationStack} options={{ drawerIcon: ({ color }) => (
-          <Icon name="cutlery" type="font-awesome" size={24} color={color} /> )}} />
-          <Drawer.Screen name="My Favourites" component={FavouriteStack} options={{ drawerIcon: ({ color }) => (
-          <Icon name="heart" type="font-awesome" size={24} color={color} /> )}} />
+          <Drawer.Screen name="Login" component={LoginStack} options={{
+            drawerIcon: ({ color }) => (
+              <Icon name="sign-in" type="font-awesome" size={24} color={color} />)
+          }} />
+          <Drawer.Screen name="Home" component={HomeStack} options={{
+            drawerIcon: ({ color }) => (
+              <Icon name="home" type="font-awesome" size={24} color={color} />)
+          }} />
+          <Drawer.Screen name="About Us" component={AboutStack} options={{
+            drawerIcon: ({ color }) => (
+              <Icon name="info-circle" type="font-awesome" size={24} color={color} />)
+          }} />
+          <Drawer.Screen name="Menu" component={MenuStack} options={{
+            drawerIcon: ({ color }) => (
+              <Icon name="list" type="font-awesome" size={24} color={color} />)
+          }} />
+          <Drawer.Screen name="Contact Us" component={ContactStack} options={{
+            drawerIcon: ({ color }) => (
+              <Icon name="address-card" type="font-awesome" size={22} color={color} />)
+          }} />
+          <Drawer.Screen name="Reserve Table" component={ReservationStack} options={{
+            drawerIcon: ({ color }) => (
+              <Icon name="cutlery" type="font-awesome" size={24} color={color} />)
+          }} />
+          <Drawer.Screen name="My Favourites" component={FavouriteStack} options={{
+            drawerIcon: ({ color }) => (
+              <Icon name="heart" type="font-awesome" size={24} color={color} />)
+          }} />
         </Drawer.Navigator>
       </NavigationContainer>
     );
